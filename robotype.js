@@ -12,8 +12,7 @@
 
   "use strict";
 
-  var UP_KEY = 38,
-    DOWN_KEY = 40;
+  var ENTER_KEY = 13, UP_KEY = 38, DOWN_KEY = 40;
 
   /**
    * @private
@@ -101,13 +100,19 @@
     scrollTo(this.$currentElem);
   };
 
+  var completeSelection = function (targetElem) {
+    var text = targetElem.text();
+    console.log('You selected ' + text);
+    $('#'+this.name)[0].value = text;
+  };
+
   /**
    * @public
    * @constructor
    * Creates an instance of the RoboType object.
    */
   var RoboType = function(name, datasource, options) {
-    var inputElemSelector = "input[name=" + name + "]", self = this;
+    var inputElemSelector = "#" + name, self = this;
 
     if (!_.isFunction(datasource.fetch) || !_.isFunction(datasource.save)) {
       throw new Error("The datasource must have a fetch and save method.");
@@ -141,7 +146,7 @@
     };
 
     Template[this.config.partialName].rendered = function () {
-      console.log('Twas rendered ', this);  
+      console.log('Twas rendered ');
       self.setCurrentElem($('.selected'));
     };
 
@@ -179,6 +184,9 @@
       self.results.remove({});
       return;
 
+    } else if (pressedKey === ENTER_KEY && this.$currentElem) {
+      completeSelection.call(this, this.$currentElem);
+
     } else if (pressedKey === DOWN_KEY && this.$currentElem) {
       console.log('down');
       changeSelection.call(this, this.$currentElem.next());
@@ -198,8 +206,10 @@
       var $first = $list.children().first();
       $first.addClass('selected');
 
+      var $final = self.config.listTemplate({id: self.config.partialName, list: $list.html()});
+
       self.results.remove({});
-      self.results.insert({items: $list.html()});
+      self.results.insert({items: _.unescape($final)});
     }
   };
 
