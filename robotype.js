@@ -97,7 +97,6 @@
    * Changes the currently selected item.
    */
   var changeSelection = function (targetElem) {
-    console.log('changing selection');
     this.setCurrentElem(targetElem);
     scrollTo(this.$currentElem);
   };
@@ -133,7 +132,6 @@
     self.results = new Meteor.Collection(null);
 
     Meteor._def_template(this.config.partialName, function () {
-      console.log('Template fueled!')
       var result = self.results.findOne();
       return result ? result.items : '';
     });
@@ -143,7 +141,7 @@
     };
 
     Template[this.config.partialName].rendered = function () {
-      console.log('Twas rendered');
+      console.log('Twas rendered ', this);  
       self.setCurrentElem($('.selected'));
     };
 
@@ -193,11 +191,7 @@
       var $list = $('<div>'); // temporary container
 
       _.forEach(results, function(result) {
-        var $item = $('<li>');
-        if (self.config.itemTemplate) {
-          $item = $(self.config.itemTemplate({item: result}));
-        }
-        $item.html(result);
+        var $item = $(self.config.itemTemplate({item: result}));
         $item.appendTo($list);
       });
 
